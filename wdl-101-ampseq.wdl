@@ -47,7 +47,7 @@ workflow amplicon_decontamination_detect {
 			justConcatenate = justConcatenate,
 			maxMismatch = maxMismatch,
 			path_to_DADA2 = path_to_DADA2,
-			overlap_pr1 = overlap_pr1
+			overlap_pr1 = overlap_pr1,
 			overlap_pr2 = overlap_pr2
 	}
 
