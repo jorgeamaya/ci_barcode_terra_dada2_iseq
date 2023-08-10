@@ -289,8 +289,8 @@ def trim_primer(sampleid, fileF, fileR, res_dir, subdir, pr1, pr2, prefix, keep_
 		sys.stderr = open(file_nameerr, "w")
 
 		cmd = ['cutadapt', '-g', f'file:{pr1}', '-G', f'file:{pr2}',
-			'-o', os.path.join(res_dir, "PrimerRem", f'{sampleid}_{prefix}_1.fq.gz'),
-			'-p', os.path.join(res_dir, "PrimerRem", f'{sampleid}_{prefix}_2.fq.gz'),
+			'-o', os.path.join(res_dir, subdir, f'{sampleid}_{prefix}_1.fq.gz'),
+			'-p', os.path.join(res_dir, subdir, f'{sampleid}_{prefix}_2.fq.gz'),
 			'--pair-adapters', '--action=trim']
 
 		if keep_untrimmed:
@@ -300,7 +300,7 @@ def trim_primer(sampleid, fileF, fileR, res_dir, subdir, pr1, pr2, prefix, keep_
 			cmd.append('--discard-untrimmed')
 
 		cmd.extend([fileF, fileR])
-
+		print(cmd)
 		proc = subprocess.Popen(cmd, stdout=sys.stdout, stderr=sys.stderr)
 		proc.wait()
 

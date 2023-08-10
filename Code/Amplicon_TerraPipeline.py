@@ -356,6 +356,16 @@ def main():
 		seqtab = ad.merge_seqtab(seqtab_op, seqtab_nop)
 		seqtab.to_csv(os.path.join(res_dir, 'seqtab_mixed_contamination.tsv'), sep = "\t")
 
+		cmd = ['mkdir', os.path.join(res_dir, 'DADA2_Contamination')] 
+		print(cmd)
+		proccp = subprocess.Popen(cmd, stdout=sys.stdout, stderr=sys.stderr)
+		proccp.wait()
+
+		cmd = ['cp', os.path.join(res_dir, 'seqtab_mixed_contamination.tsv'), os.path.join(res_dir, 'DADA2_Contamination/seqtab.tsv')] 
+		print(cmd)
+		proccp = subprocess.Popen(cmd, stdout=sys.stdout, stderr=sys.stderr)
+		proccp.wait()
+
 	if args.postproc_dada2:		
 		ad.flush_dir(res_dir, "PostProc_DADA2")
 
@@ -403,8 +413,10 @@ def main():
 		amplicons = ac.parse_amp_db(path_to_amp_db)
 		if not amplicons:
 			print(f"ERROR: No amplicons in {path_to_amp_db}", file=sys.stderr)
-			sys.exit(1)
+			sys.exit("ERROR: No amplicons")
+			#sys.exit(1)
 
+		mask = {}
 		#Disabled. Possibly deprecated
 		#if amp_mask:
 		#	print(f"INFO: Loading {amp_mask}", file=sys.stderr)
@@ -412,13 +424,13 @@ def main():
 		#else:
 		#	print(f"INFO: No mask data specified.", file=sys.stderr)
 		#	mask = {}
-		mask = {}
 
 		print(f"INFO: Loading {path_to_fasta}")
 		asvs = ac.get_asv_seqs(path_to_fasta)
 		if not asvs:
 			print(f"ERROR: No ASV sequences in {path_to_fasta}", file=sys.stderr)
-			sys.exit(1)
+			sys.exit("ERROR: No ASV sequences")	
+			#sys.exit(1)
 
 		print(f"INFO: Parsing {path_to_table} with total reads >= {min_reads}, samples >= {min_samples}, snv_dist <= {max_snv_dist}, indel_dist <= {max_indel_dist}", file=sys.stderr)
 
@@ -433,7 +445,8 @@ def main():
 		bins = ac.parse_asv_table(path_to_table, min_reads=min_reads, min_samples=min_samples, max_snv_dist=max_snv_dist, max_indel_dist=max_indel_dist, include_failed=include_failed, exclude_bimeras=exclude_bimeras) #This function only matches to the first strain.
 		if not bins:
 			print(f"ERROR: No useable data in {path_to_table}", file=sys.stderr)
-			sys.exit(1)
+			sys.exit("ERROR: No useable data")
+			#sys.exit(1)
 
 		outdir = path_to_alignments
 		print(f"INFO: Writing amplicon fasta files to {outdir}", file=sys.stderr)
@@ -448,7 +461,8 @@ def main():
 		cigars = ac.parse_alignments(bins, mask=mask, min_homopolymer_length=polyN, outdir=outdir, verbose=False)
 		if not cigars:
 			print("ERROR: could not determine CIGAR strings", file=sys.stderr)
-			sys.exit(1)
+			sys.exit("ERROR: could not determine CIGAR strings")
+			#sys.exit(1)
 
 		if path_asv_to_cigar:
 			ac.write_cigar_strings(cigars, path_asv_to_cigar)

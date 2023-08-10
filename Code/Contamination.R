@@ -73,6 +73,8 @@ if(basename(data_dir) == 'Merge'){
   empty_samples = c()
   for (file in file_list) {
     file_path = paste0(path = data_dir, file) # current directory assumed
+    print("file_path")
+    print(file_path)
     if (file.info(file_path)$size == 1) {
       next
     }
@@ -373,16 +375,16 @@ if(basename(data_dir) == 'Merge'){
   m_sample_status_p_melted_reshaped$sample_id = rownames(m_sample_status_p_melted_reshaped)
   m_sample_status_p_melted_reshaped = m_sample_status_p_melted_reshaped[match(samples_order, m_sample_status_p_melted_reshaped$sample_id),]
   
-  mergedata = read.csv(file.path(dirname(dirname(data_dir)), 
+  mergedata = read.table(file.path(dirname(dirname(data_dir)), 
                                  "Results", "DADA2_Contamination", "seqtab.tsv"), 
-                       sep="\t", header=TRUE)
+                       sep="\t", header=TRUE, row.names = 1)
   mergedata <- mergedata[match(samples_order, row.names(mergedata)), ]
   
   m_sample_status_p_melted_reshaped$Well_Productivity = rowSums(mergedata)
   m_sample_status_p_melted_reshaped$Productivity_Flag = m_sample_status_p_melted_reshaped$Well_Productivity < joined_threshold
   
   #Adjust table to include samples with no reads
-  rows = rownames(m_sample_status_p_melted_reshaped) 
+  rows = rownames(m_sample_status_p_melted_reshaped)
   no_mergers = samples_order[!rows %in% samples_order]
   rows[grep('^NA', rows)] = no_mergers  
   rownames(m_sample_status_p_melted_reshaped) = rows

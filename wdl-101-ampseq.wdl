@@ -22,8 +22,10 @@ workflow amplicon_decontamination_detect {
 		Int justConcatenate = 0
 		Int maxMismatch = 0
 		String path_to_DADA2 = '/Code'
+		File overlap_pr1
+		File overlap_pr2
 	}
-	call ampseq_dada2merge_process {
+	call ampseq_dada2merge_iseq_process {
 		input:
 			path_to_fq = path_to_fq,
 			path_to_flist = path_to_flist,
@@ -45,27 +47,29 @@ workflow amplicon_decontamination_detect {
 			justConcatenate = justConcatenate,
 			maxMismatch = maxMismatch,
 			path_to_DADA2 = path_to_DADA2,
+			overlap_pr1 = overlap_pr1
+			overlap_pr2 = overlap_pr2
 	}
 
 	output {
-		File rawfilelist_f = ampseq_dada2merge_process.rawfilelist
-		File missing_files_f = ampseq_dada2merge_process.missing_files
-		File Barcode_report_abs_f = ampseq_dada2merge_process.Barcode_report_abs
-		File Barcode_report_per_f = ampseq_dada2merge_process.Barcode_report_per
-		File Insert_size_f = ampseq_dada2merge_process.Insert_size
-		File Match_report_abs_f = ampseq_dada2merge_process.Match_report_abs
-		File Match_report_per_f = ampseq_dada2merge_process.Match_report_per
-		File barcodes_report_dada2_f = ampseq_dada2merge_process.barcodes_report_dada2
-		File hamming_distances_forward_f = ampseq_dada2merge_process.hamming_distances_forward
-		File hamming_distances_reverse_f = ampseq_dada2merge_process.hamming_distances_reverse	
-		File seqtab_f = ampseq_dada2merge_process.seqtab
-		File sequences_barplot_f = ampseq_dada2merge_process.sequences_barplot
-		File stacked_barplot_per_f = ampseq_dada2merge_process.stacked_barplot
-		File stacked_barplot_f = ampseq_dada2merge_process.stacked_barplot
+		File rawfilelist_f = ampseq_dada2merge_iseq_process.rawfilelist
+		File missing_files_f = ampseq_dada2merge_iseq_process.missing_files
+		File Barcode_report_abs_f = ampseq_dada2merge_iseq_process.Barcode_report_abs
+		File Barcode_report_per_f = ampseq_dada2merge_iseq_process.Barcode_report_per
+		File Insert_size_f = ampseq_dada2merge_iseq_process.Insert_size
+		File Match_report_abs_f = ampseq_dada2merge_iseq_process.Match_report_abs
+		File Match_report_per_f = ampseq_dada2merge_iseq_process.Match_report_per
+		File barcodes_report_dada2_f = ampseq_dada2merge_iseq_process.barcodes_report_dada2
+		File hamming_distances_forward_f = ampseq_dada2merge_iseq_process.hamming_distances_forward
+		File hamming_distances_reverse_f = ampseq_dada2merge_iseq_process.hamming_distances_reverse	
+		File seqtab_f = ampseq_dada2merge_iseq_process.seqtab
+		File sequences_barplot_f = ampseq_dada2merge_iseq_process.sequences_barplot
+		File stacked_barplot_per_f = ampseq_dada2merge_iseq_process.stacked_barplot_per
+		File stacked_barplot_f = ampseq_dada2merge_iseq_process.stacked_barplot
 	}
 }
 
-task ampseq_dada2merge_process {
+task ampseq_dada2merge_iseq_process {
 	input {
 		String path_to_fq 
 		File path_to_flist
@@ -87,6 +91,8 @@ task ampseq_dada2merge_process {
 		Int justConcatenate = 0
 		Int maxMismatch = 0
 		String path_to_DADA2 = '/Code'
+		File overlap_pr1
+		File overlap_pr2
 	}
 
 	Map[String, String] in_map = {
@@ -110,6 +116,8 @@ task ampseq_dada2merge_process {
 		"justConcatenate": justConcatenate,
 		"maxMismatch": maxMismatch,
 		"path_to_DADA2": path_to_DADA2,
+		"overlap_pr1" : sub(overlap_pr1, "gs://", "/cromwell_root/"),
+		"overlap_pr2" : sub(overlap_pr2, "gs://", "/cromwell_root/")
 	}
 	File config_json = write_json(in_map)
 	command <<<
@@ -120,7 +128,7 @@ task ampseq_dada2merge_process {
 	gsutil ls ~{path_to_fq}
 	gsutil -m cp -r ~{path_to_fq}* fq_dir/
 
-	python /Code/Amplicon_TerraPipeline.py --config ~{config_json} --overlap_reads --meta --repo --adaptor_removal --primer_removal --dada2_contamination
+	python /Code/Amplicon_TerraPipeline.py --config ~{config_json} --mixed_reads --meta --repo --adaptor_removal --primer_removal --dada2_contamination
 
 	Rscript /Code/Contamination.R Report/DADA2_Contamination/ Report/ ~{path_to_flist} ~{joined_threshold} ~{contamination_threshold}
 	find . -type f
@@ -149,6 +157,6 @@ task ampseq_dada2merge_process {
 		bootDiskSizeGb: 10
 		preemptible: 3
 		maxRetries: 1
-		docker: 'jorgeamaya/ci_barcode_terra_dada2:v1'
+		docker: 'jorgeamaya/ci_barcode_terra_dada2_iseq:v1'
 	}
 }

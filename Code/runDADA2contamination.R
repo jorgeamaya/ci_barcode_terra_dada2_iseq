@@ -189,7 +189,6 @@ if (class == "parasite") {
   } else {
     maxMismatch = as.numeric(maxMismatch)
   }
-  
 } else {
   stop("Please provide valid option for the '--class' argument")
 }
@@ -295,7 +294,6 @@ for(sample in sample.names){
   insert_sizes = c()
   print(sample)
   for (sequence in mergers[[sample]]$sequence){
-
     match_tmp = match_fun(sample, sequence, barcodes, dist)
       
     forward_barcodes = c(forward_barcodes, match_tmp[[1]])
@@ -396,9 +394,25 @@ for(sample.name in names(track[,1])) {
   adap_f_reads = count_reads(adap_f)
   adap_r_reads = count_reads(adap_r)
   
-  prim_f <- file.path(dirname(work_dir), "PrimerRem", paste0(sample.name, "_prim_1.fq.gz"))
-  prim_r <- file.path(dirname(work_dir), "PrimerRem", paste0(sample.name, "_prim_2.fq.gz"))
+  results_pos <- regexpr("Results/", path_to_meta)
+  mixed_pos <- regexpr("/mixed", path_to_meta)
   
+  # Extract the substring between "Results/" and "mixed"
+  prim <- substr(path_to_meta, results_pos + attr(results_pos, "match.length"), mixed_pos - 1)
+  if (prim == "PrimerRem_NOP") {
+    ext_1 = '_mixed_nop_1.fq.gz'
+    ext_2 = '_mixed_nop_2.fq.gz'
+  } else if (prim == "PrimerRem_OP") {
+    ext_1 = '_mixed_op_1.fq.gz'
+    ext_2 = '_mixed_op_2.fq.gz'
+  }else{
+    ext_1 = '_prim_1.fq.gz'
+    ext_2 = '_prim_2.fq.gz'
+  }
+  
+  prim_f <- file.path(dirname(work_dir), prim, paste0(sample.name, ext_1))
+  prim_r <- file.path(dirname(work_dir), prim, paste0(sample.name, ext_2))
+
   prim_f_reads = count_reads(prim_f)
   prim_r_reads = count_reads(prim_r)
   
@@ -530,4 +544,3 @@ if (is.null(save_run)||save_run == '') {
 } else {
   save.image(paste0(work_dir,"/",save_run))
 }
-
