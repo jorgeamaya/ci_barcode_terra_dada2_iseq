@@ -63,9 +63,12 @@ workflow amplicon_decontamination_detect {
 		File hamming_distances_forward_f = ampseq_dada2merge_iseq_process.hamming_distances_forward
 		File hamming_distances_reverse_f = ampseq_dada2merge_iseq_process.hamming_distances_reverse	
 		File seqtab_f = ampseq_dada2merge_iseq_process.seqtab
-		File sequences_barplot_f = ampseq_dada2merge_iseq_process.sequences_barplot
-		File stacked_barplot_per_f = ampseq_dada2merge_iseq_process.stacked_barplot_per
-		File stacked_barplot_f = ampseq_dada2merge_iseq_process.stacked_barplot
+		File sequences_barplot_op_f = ampseq_dada2merge_iseq_process.sequences_barplot_op
+		File stacked_barplot_per_op_f = ampseq_dada2merge_iseq_process.stacked_barplot_per_op
+		File stacked_barplot_op_f = ampseq_dada2merge_iseq_process.stacked_barplot_op
+		File sequences_barplot_nop_f = ampseq_dada2merge_iseq_process.sequences_barplot_nop
+		File stacked_barplot_per_nop_f = ampseq_dada2merge_iseq_process.stacked_barplot_per_nop
+		File stacked_barplot_nop_f = ampseq_dada2merge_iseq_process.stacked_barplot_nop
 	}
 }
 
@@ -147,10 +150,12 @@ task ampseq_dada2merge_iseq_process {
 		File hamming_distances_forward = "Report/hamming_forward.tsv"
 		File hamming_distances_reverse = "Report/hamming_reverse.tsv"
 		File seqtab = "Results/DADA2_Contamination/seqtab.tsv"
-		File sequences_barplot = "Results/DADA2_Contamination/sequences_barplot.svg"
-		File stacked_barplot_per = "Results/DADA2_Contamination/stacked_barplot_per.svg"
-		File stacked_barplot = "Results/DADA2_Contamination/stacked_barplot.svg"
-
+		File sequences_barplot_op = "Results/DADA2_OP_Contamination/sequences_barplot.svg"
+		File stacked_barplot_per_op = "Results/DADA2_OP_Contamination/stacked_barplot_per.svg"
+		File stacked_barplot_op = "Results/DADA2_OP_Contamination/stacked_barplot.svg"
+		File sequences_barplot_nop = "Results/DADA2_NOP_Contamination/sequences_barplot.svg"
+		File stacked_barplot_per_nop = "Results/DADA2_NOP_Contamination/stacked_barplot_per.svg"
+		File stacked_barplot_nop = "Results/DADA2_NOP_Contamination/stacked_barplot.svg"
 	}
 	runtime {
 		cpu: 1
